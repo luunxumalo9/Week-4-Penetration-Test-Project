@@ -257,7 +257,7 @@ Run the controlled attack.
 Analyze the responses and identify differences between failed and successful attempts.
 Document the findings and evidence.
 
-Key Learning
+Key Learning:
 
 One of the main things I learned is that Burp Suite is not simply a password cracking tool. It allows a penetration tester to intercept, modify, automate, and analyze web requests.
 
@@ -276,8 +276,7 @@ Multi-factor authentication (MFA)
 CAPTCHA or bot detection
 Monitoring and alerting for repeated failed logins
 
-Tools Used
-
+Tools Used:
 Burp Suite
 Web browser
 Authorized test environment
