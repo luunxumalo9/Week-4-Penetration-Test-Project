@@ -9,9 +9,9 @@ Enviroment: Kali LinuxVM.
 Command: whois medirozahospital.com
 
 Findings
--Registrar: NameCheap, Inc
--Domain created: 14/08/2026
--Domain expires: 14/08/2027 (recently registered)
+Registrar: NameCheap, Inc
+Domain created: 14/08/2026
+Domain expires: 14/08/2027 (recently registered)
 
 Name servers:
 DNS1.NAMECHEAPHOSTING.COM,
@@ -24,9 +24,9 @@ Status: clientTransferProhibited (transfer lock enabled)
 Abuse contact: abuse@namecheap.com
 
 Takeaway:
--DNS and likely hosting are through NNamecheap, which tells me where to look next.
--DNSSEC is unsigned, so DNS responses aren’t cryptographically validated (a minor hardening gap)
--The domain is only weeks old, which is worth noting for.a hospital site.
+DNS and likely hosting are through NNamecheap, which tells me where to look next.
+DNSSEC is unsigned, so DNS responses aren’t cryptographically validated (a minor hardening gap)
+The domain is only weeks old, which is worth noting for.a hospital site.
 
 #Subdomain and email Enumeration: theHarverster
 Command: theHarvester -d medirozahospital.com -b crtsh
@@ -59,14 +59,14 @@ Command: dnsrecon -d medirozahospital.com
 
 Results: 12 DNS records found 
 
--Name servers: dns1/dns2.namecheaphosting.com
--DNSSEC: No answer to DNSSEC query (unsigned, consistent with the whois finding)
--Bind version: disclosed as "Nameserver" string on both nameservers
--A record: medirozahospital.com - 199.188.201.16
--MX records: mx1/mx2/mx3-hosting.jelly.systems (162.255.118.28/.297.13)
--SPF(TXT): *v=spf1 +a +mx +ip4:199:188:201:16.7 +ip4:199.188.201.38 include:spf.web-hosting.com -all
--DMARC(TXT): v=DMARC; p=none; policy set to "none" meaning spoofed mail isn’t rejected or quarantined
--SRV records:CalDAV/CaedDav on medirozahospital.com (199.188.201.16), and autodiscover pointing to cPanel email discovery service (cpanelemaildiscovery.cpanel.net)across 6 IPs
+Name servers: dns1/dns2.namecheaphosting.com
+DNSSEC: No answer to DNSSEC query (unsigned, consistent with the whois finding)
+Bind version: disclosed as "Nameserver" string on both nameservers
+A record: medirozahospital.com - 199.188.201.16
+MX records: mx1/mx2/mx3-hosting.jelly.systems (162.255.118.28/.297.13)
+SPF(TXT): *v=spf1 +a +mx +ip4:199:188:201:16.7 +ip4:199.188.201.38 include:spf.web-hosting.com -all
+DMARC(TXT): v=DMARC; p=none; policy set to "none" meaning spoofed mail isn’t rejected or quarantined
+SRV records:CalDAV/CaedDav on medirozahospital.com (199.188.201.16), and autodiscover pointing to cPanel email discovery service (cpanelemaildiscovery.cpanel.net)across 6 IPs
 
 Takeway: Mail infrastructure runs through ePanel based hosting (jellyfish.systems/web hosting.com), seperate from the main site. The DMARC policy of p=none is a real finding, it means the domain doesn’t instruct receiving mail servers to reject or quarantine spoofed emails claiming to be from medirozahospital.com, which is  a phishing risk against staff or patients.
 
@@ -76,11 +76,11 @@ Recommendation: Tighten DMARC policy to p=quarantine or p=reject once SPF/DKIM a
 Command: curl -i -L medirozahospital.com
 
 Results:
--Sitebredirects HTTP HTTPS (301,then 200 ok)
--Server: LifeSpeed
--CMS identified via met tag: Mediroza CMS 1.4.2
-- Author meta tag reveals internal team name: "Mediroza IT department"
--Two authentication endpoints discovered in page source:
+Sitebredirects HTTP HTTPS (301,then 200 ok)
+Server: LifeSpeed
+CMS identified via met tag: Mediroza CMS 1.4.2
+Author meta tag reveals internal team name: "Mediroza IT department"
+Two authentication endpoints discovered in page source:
                                                         /staff/login.php (staff login)
                                                        /patient/login.php (patient portal login)
 Takeaway: The generator meta tag exposes the axact CMS and version in use (mediroza CMS 1.4.2), useful for an attcker to look up known vulnerabilities for that version.Response headres cornfirm LiteSpeed as the web server. Two login portals were identified as potential targets for further testing (brute force protection default credentials), subject to authorized scope.
@@ -91,11 +91,11 @@ Takeaway: The generator meta tag exposes the axact CMS and version in use (medir
 Command: whatweb medirozahospital.com
 
 Results:
--http://medirozahospital.com 301 Moved Permanently redirects to https
--https://medirozahospital.com 403 Forbidden
--Server: LiteSpeed,HTTP/1.1
--country: United States
--Uncommon header:x turbo charged by
+http://medirozahospital.com 301 Moved Permanently redirects to https
+https://medirozahospital.com 403 Forbidden
+Server: LiteSpeed,HTTP/1.1
+country: United States
+Uncommon header:x turbo charged by
 
 Takeaway: whatweb received a 403 Forbidden on the HTTPS site, while the earlier curl -i -L request returned a full 200 OK with page content. this suggest the server or a WAF is filtering requests based on User-Agent or request signature. whatweb default request was blocked where curl wasn’t. This is itself a finding basic bot/scanner filtering is in place though inconsistency applied since a slightly different request by passwd it
 
@@ -103,26 +103,123 @@ Takeaway: whatweb received a 403 Forbidden on the HTTPS site, while the earlier 
 Command nmap -sV medirozahospital.com
 
 Results:
--Host: medirozahospital.com
--DNS: server247-1.webhosting.com
--998 ports filtered (no response), 2 open:
+Host: medirozahospital.com
+DNS: server247-1.webhosting.com
+998 ports filtered (no response), 2 open:
                                          - 80/tcp http OpenResty web app server 1.31.1.1
                                          - 443/tcp ssl/http OpenResty web app server 1.31.1.1
 
 Takeaway: Nmap identifies the server as OpenResty which conflicts with the LiteSoeed server header see in thr curl and whatweb results. This suggests a reverse proxy or CDN layer (OpenResty) sits in front of the actual origin server. The reverse DNS server 274-1.webhosting.com confirms shared hosting on Namecheap/webhosting.com infrastructure. Only ports 80/443 are exposed, all other ports are filtered which is good security practice. No unnecessary services are reachable from the internet.
 
-##Summary Of Key Findings
+#Summary Of Key Findings
 
-Finding                                                 severity         
-1 DNSSEC unsigned                                        Low
-2 CMS version disclosed (mediroza CMS 1.4.2)             Low/Medium
-via meta tag
-3 DMARC policy set to p=none                             Medium
-4 Inconsistent WAF/bot filtering
-(whatweb blocked, curl allowed)                          Informational
-5 Reverse proxy (OpenResty)masks true
-orign server LiteSpeed                                   Informational 
-6 Only ports 80/443 exposed                              Positive 
+
+ | Finding | Severity |
+|---------|----------|
+| DNSSEC unsigned | Low |
+| CMS version disclosed (Mediroza CMS 1.4.2) via meta tag | Low/Medium |
+| DMARC policy set to p=none | Medium |
+| Inconsistent WAF/bot filtering (whatweb blocked, curl allowed) | Informational |
+| Reverse proxy (OpenResty) masks true origin server (LiteSpeed) | Informational |
+| Only ports 80/443 exposed | Positive |
+
+
+#Week 4 - Penetration Test Project
+
+Target:medirozahospital.com (authorized training target — Network Walks internship, group B083D)
+
+Tools used: Burp Suite, pdfcrack, curl
+Environment: Kali Linux VM
+
+
+#Authentication Bypass — SQL Injection (Burp Suite Intruder)
+
+Target:/patient/login.php
+Payload:admin'%20-- in the username field
+
+Result: Returned a 302 redirect to portal.php with a response length of 335 bytes, distinct from all failed-login responses (~2770+ bytes).
+
+Analysis: The '-- sequence comments out the rest of the SQL query, likely bypassing the password check entirely for the admin user.
+
+Impact: Full authentication bypass on the patient portal.
+
+Recommendation:** Use parameterized queries for all authentication logic, validate input server-side, implement login rate limiting and lockout, and log/alert on SQL metacharacters in auth fields.
+
+
+#Post-Bypass Access — Exposed Patient Lab Reports
+
+URL:/patient/portal.php (reached via the bypass in Finding 1)
+
+Result: The portal listed 3 downloadable, password-protected lab reports.
+
+Takeaway: A single SQL injection flaw led directly to unauthenticated access to what should be private patient health records.
+
+Recommendation: Enforce authorization checks server-side on every report/file request, not just at login, so one auth bypass doesn't cascade into full data exposure.
+
+
+#Directory Listing Enabled
+
+URLs:/patient/ and /staff/
+
+Result: Both directories have browsing enabled, exposing internal filenames download.php error_log login.php logout.php portal.php
+
+Takeaway: Directory indexing reveals internal structure and filenames that help plan further attacks; an exposed error_log could also leak debug information.
+
+Recommendation: Disable directory listing on the web server, and move files like error_log outside the web root.
+
+
+#Weak PDF Encryption Password — pdfcrack
+
+Command: pdfcrack -f patient_report_2.pdf -w rockyou.txt
+
+Result: Password cracked almost instantly: "password"
+
+Takeaway: The PDF's encryption may be standards-compliant, but it's meaningless with a trivially guessable password.
+
+Recommendation: Enforce strong, randomly generated passwords for any password-protected documents; consider authenticated document delivery instead of password-protected PDFs.
+
+
+#Robots.txt Disclosure
+
+Command: curl -s https://medirozahospital.com/robots.txt
+
+Result:
+User-agent: 
+Disallow: /patient/
+Disallow: /staff/
+Disallow: /old/
+Sitemap: https://medirozahospital.com/sitemap.xml
+
+
+Takeaway: robots.txt is meant to guide crawlers, not restrict access — but by listing /patient/, /staff/, and /old/, it effectively advertises sensitive paths to investigate, including a previously undiscovered /old/ path.
+
+Recommendation: Don't rely on robots.txt for access control. Enforce authentication/authorization on these paths server-side, and review whether the /old/ directory is still needed.
+
+
+#Legacy File Exposure (details withheld)
+
+A legacy file was discovered at a path disclosed via robots.txt (Finding 5), publicly accessible with no authentication required. The file's own header identified it as containing confidential internal records.
+
+Details have been withheld from this public report due to the sensitivity of the exposed data. Full details available on request to authorized reviewers (e.g. course instructor).
+
+Takeaway: This was the most severe finding in the assessment old/legacy files left in a publicly accessible web directory with no access control represent a critical, independent risk.
+
+Recommendation: Remove all legacy/backup files from publicly accessible web directories immediately, store them outside the web root with access controls, and audit for other forgotten files under deprecated paths.
+
+
+#Summary of Key Findings
+
+| # | Finding | Severity | Recommendation |
+|---|---------|----------|-----------------|
+| 1 | SQL injection auth bypass on patient login | Critical | Parameterized queries, input validation, rate limiting |
+| 2 | Unauthenticated access to patient lab reports post-bypass | Critical | Server-side authorization on every file request |
+| 3 | Directory listing enabled on /patient/ and /staff/ | Medium | Disable directory indexing, move error_log out of web root |
+| 4 | Weak/guessable PDF password ("password") | High | Enforce strong, randomized document passwords |
+| 5 | robots.txt discloses sensitive paths | Low | Don't rely on robots.txt for access control |
+| 6 | Legacy file publicly exposed (details withheld) | Critical | Remove legacy files from public paths, store backups securely |
+
+
+
 
 
                       
