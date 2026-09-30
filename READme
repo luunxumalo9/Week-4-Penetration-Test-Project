@@ -103,7 +103,26 @@ Takeaway: whatweb received a 403 Forbidden on the HTTPS site, while the earlier 
 Command nmap -sV medirozahospital.com
 
 Results:
+-Host: medirozahospital.com
+-DNS: server247-1.webhosting.com
+-998 ports filtered (no response), 2 open:
+                                         - 80/tcp http OpenResty web app server 1.31.1.1
+                                         - 443/tcp ssl/http OpenResty web app server 1.31.1.1
 
+Takeaway: Nmap identifies the server as OpenResty which conflicts with the LiteSoeed server header see in thr curl and whatweb results. This suggests a reverse proxy or CDN layer (OpenResty) sits in front of the actual origin server. The reverse DNS server 274-1.webhosting.com confirms shared hosting on Namecheap/webhosting.com infrastructure. Only ports 80/443 are exposed, all other ports are filtered which is good security practice. No unnecessary services are reachable from the internet.
+
+##Summary Of Key Findings
+
+Finding                                                 severity         
+1 DNSSEC unsigned                                        Low
+2 CMS version disclosed (mediroza CMS 1.4.2)             Low/Medium
+via meta tag
+3 DMARC policy set to p=none                             Medium
+4 Inconsistent WAF/bot filtering
+(whatweb blocked, curl allowed)                          Informational
+5 Reverse proxy (OpenResty)masks true
+orign server LiteSpeed                                   Informational 
+6 Only ports 80/443 exposed                              Positive 
 
 
                       
