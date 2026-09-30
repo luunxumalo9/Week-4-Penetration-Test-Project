@@ -219,6 +219,76 @@ Recommendation: Remove all legacy/backup files from publicly accessible web dire
 | 6 | Legacy file publicly exposed (details withheld) | Critical | Remove legacy files from public paths, store backups securely |
 
 
+Burp Suite BruteForce Testing
+
+Overview
+
+After completing the reconnaissance phase, I moved on to testing the web application’s authentication mechanism using Burp Suite.
+
+The purpose of this exercise was to understand how Burp Suite can be used during an authorized penetration test to analyze login requests and perform controlled brute-force testing.
+
+What I Learned
+
+During this phase, I learned how to:
+
+Configure and use Burp Suite Proxy to intercept HTTP/HTTPS requests.
+Capture a login request from a web application.
+Examine the parameters sent to the server during authentication.
+Send captured requests to Intruder for automated testing.
+Identify the username and password parameters that could be tested.
+Configure payload positions in Burp Suite.
+Run a controlled brute-force/password-testing attack within the authorized lab environment.
+Compare responses to identify differences between unsuccessful and potentially successful authentication attempts.
+Review HTTP status codes, response lengths, and response content when analyzing results.
+Understand why weak passwords can create a security risk.
+
+Methodology
+
+The general process I followed was:
+
+Open the authorized target application.
+Configure the browser to work through Burp Suite.
+Intercept the login request using Proxy.
+Examine the request and identify the authentication parameters.
+Send the request to Intruder.
+Configure the appropriate attack position.
+Load the authorized test wordlist/payloads.
+Run the controlled attack.
+Analyze the responses and identify differences between failed and successful attempts.
+Document the findings and evidence.
+
+Key Learning
+
+One of the main things I learned is that Burp Suite is not simply a password cracking tool. It allows a penetration tester to intercept, modify, automate, and analyze web requests.
+
+During brute-force testing, the important part is not only sending many passwords but also understanding how the application’s responses change and what those differences tell the tester.
+
+Security Considerations
+
+Brute-force testing should only be performed against systems where explicit authorization has been provided.
+
+Applications can reduce the risk of brute-force attacks by implementing controls such as:
+
+Strong password policies
+Account lockout or temporary delays
+Rate limiting
+Multi-factor authentication (MFA)
+CAPTCHA or bot detection
+Monitoring and alerting for repeated failed logins
+
+Tools Used
+
+Burp Suite
+Web browser
+Authorized test environment
+Approved wordlist/payloads
+
+Outcome
+
+This exercise helped me understand the practical workflow of using Burp Suite Intruder to perform controlled authentication testing and analyze web application responses.
+
+It also helped me understand how reconnaissance findings can be followed by a more focused testing phase during a penetration test.
+
 
 
 
